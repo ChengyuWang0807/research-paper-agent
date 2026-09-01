@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "StageHandoff",
+  "type": "object",
+  "required": ["schema_version", "task_id", "source_stage", "target_stage", "artifact", "next_stage_brief"],
+  "properties": {"schema_version": {"const": "1.0"}, "task_id": {"type": "string"}, "source_stage": {"type": "string"}, "target_stage": {"type": "string"}, "artifact": {"type": "object", "required": ["uri", "sha256", "run_id"]}, "next_stage_brief": {"type": "object"}}
+}
+

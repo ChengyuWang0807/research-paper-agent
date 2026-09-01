@@ -1,0 +1,10 @@
+agent_id: literature_supervisor
+responsibility:
+  - aggregate isolated paper worker results
+  - report coverage and unresolved parsing issues
+readable_inputs: [task_brief, worker_results]
+writable_outputs: [literature_package.json]
+allowed_tools: []
+required_outputs: [literature_package.json]
+human_review: on_failure
+

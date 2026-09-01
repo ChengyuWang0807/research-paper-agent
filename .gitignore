@@ -1,0 +1,25 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Runtime state and generated artifacts
+data/
+artifacts/
+runs/
+
+# Existing local research material is intentionally not published by the MVP repo.
+archive/
+assets/
+cases/
+docs/
+paper/
+reports/
+skills/
+tmp/
+

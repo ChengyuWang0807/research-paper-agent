@@ -1,0 +1,25 @@
+version: 1
+max_paper_workers: 3
+stages:
+  - id: 01_research_start
+    agent: research_starter
+    mode: single
+    approval: always
+  - id: 02_literature
+    agent: literature_supervisor
+    worker_agent: paper_worker
+    mode: paper_fanout
+    approval: on_failure
+  - id: 03_synthesis
+    agent: knowledge_synthesizer
+    mode: single
+    approval: never
+  - id: 05_writing
+    agent: paper_writer
+    mode: single
+    approval: never
+  - id: 05_audit
+    agent: citation_auditor
+    mode: single
+    approval: always
+

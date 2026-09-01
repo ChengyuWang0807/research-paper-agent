@@ -1,0 +1,10 @@
+agent_id: citation_auditor
+responsibility:
+  - audit citation existence, entailment and placement
+  - audit structure and unresolved risks
+readable_inputs: [writing_package, evidence_cards]
+writable_outputs: [audit_report.json]
+allowed_tools: [get_evidence, citation_check]
+required_outputs: [audit_report.json]
+human_review: always
+

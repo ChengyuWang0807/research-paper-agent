@@ -1,0 +1,10 @@
+agent_id: knowledge_synthesizer
+responsibility:
+  - compare evidence across papers
+  - identify consensus, conflicts and research gaps
+readable_inputs: [task_brief, literature_handoff, approved_evidence]
+writable_outputs: [knowledge_pack.json]
+allowed_tools: [keyword_search, vector_search, metadata_filter, rerank]
+required_outputs: [knowledge_pack.json]
+human_review: conditional
+

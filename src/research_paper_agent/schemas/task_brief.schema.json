@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TaskBrief",
+  "type": "object",
+  "required": ["topic", "research_questions", "scope", "status"],
+  "properties": {"topic": {"type": "string", "minLength": 1}, "research_questions": {"type": "array", "items": {"type": "string"}}, "scope": {"type": "object"}, "status": {"type": "string"}}
+}
+

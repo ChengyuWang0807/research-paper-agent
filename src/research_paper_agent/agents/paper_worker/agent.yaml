@@ -1,0 +1,10 @@
+agent_id: paper_worker
+responsibility:
+  - process exactly one paper in an isolated workspace
+  - extract paper metadata and provenance-bound evidence
+readable_inputs: [task_brief, current_paper]
+writable_outputs: [paper_card.json, evidence_cards.json, parse_report.json]
+allowed_tools: [pdf_read, table_extract, figure_extract, formula_extract]
+required_outputs: [paper_card.json, evidence_cards.json, parse_report.json]
+human_review: conditional
+

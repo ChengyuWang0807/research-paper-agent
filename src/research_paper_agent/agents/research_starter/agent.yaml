@@ -1,0 +1,9 @@
+agent_id: research_starter
+responsibility:
+  - clarify the research task and freeze its boundaries
+readable_inputs: [topic, paper_paths]
+writable_outputs: [task_brief.json]
+allowed_tools: []
+required_outputs: [task_brief.json]
+human_review: always
+

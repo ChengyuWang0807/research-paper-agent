@@ -1,0 +1,9 @@
+agent_id: paper_writer
+responsibility:
+  - build an outline and evidence-grounded draft
+readable_inputs: [task_brief, knowledge_pack]
+writable_outputs: [writing_package.json]
+allowed_tools: [get_evidence, format_citation]
+required_outputs: [writing_package.json]
+human_review: never
+
