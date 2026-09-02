@@ -5,12 +5,14 @@ import json
 from pathlib import Path
 
 from .core.agent_runner import MockAgentRunner
+from .core.dsh_runner import DeepSeekHarnessRunner
 from .core.orchestrator import Orchestrator
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Research-Paper-Agent MVP workflow")
     parser.add_argument("--root", type=Path, default=Path.cwd(), help="project root")
+    parser.add_argument("--runner", choices=("mock", "dsh"), default="mock")
     subparsers = parser.add_subparsers(dest="command", required=True)
     init_parser = subparsers.add_parser("init", help="create a task")
     init_parser.add_argument("--task-id", required=True)
@@ -30,7 +32,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    orchestrator = Orchestrator(project_root=args.root.resolve(), runner=MockAgentRunner())
+    runner = MockAgentRunner() if args.runner == "mock" else DeepSeekHarnessRunner()
+    orchestrator = Orchestrator(project_root=args.root.resolve(), runner=runner)
     if args.command == "init":
         task = orchestrator.create_task(args.task_id, args.topic, args.paper)
     elif args.command == "run":
@@ -43,4 +46,3 @@ def main(argv: list[str] | None = None) -> int:
         task = orchestrator.status(args.task_id)
     print(json.dumps(task, ensure_ascii=False, indent=2))
     return 0
-

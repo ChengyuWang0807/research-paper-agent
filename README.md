@@ -31,6 +31,16 @@ python workflow.py approve --task-id demo-001 --comment "研究边界确认"
 python workflow.py run --task-id demo-001
 ```
 
+安装 DSH 适配器并运行真实模型（需要 `DEEPSEEK_API_KEY`）：
+
+```powershell
+pip install -e ".[dsh]"
+$env:DEEPSEEK_API_KEY = "你的密钥"
+python workflow.py --runner dsh run --task-id demo-001
+```
+
+`--runner dsh` 使用 DeepSeek Harness Python SDK，通过 JSON-RPC stdio 启动运行时；每次 Agent Run 使用自己的 `cwd`、`session_root` 和日志目录。默认的 `mock` 模式不需要 SDK 或密钥。
+
 加入本地 PDF 时可以重复使用 `--paper`：
 
 ```powershell
@@ -58,5 +68,6 @@ data/app.db                         任务与审核状态（不提交）
 ## 当前边界
 
 - Mock Harness 只用于验证编排，不调用真实大模型。
+- DSH 适配器已接入，但必须显式使用 `--runner dsh`；未配置 SDK 或 API Key 时会把错误记录为该 Run 的失败，而不会静默生成成功结果。
 - PDF Worker 当前只登记文件信息，不做真实 PDF 解析。
 - 检索、Embedding、Reranker、向量库和实验闭环将在后续里程碑接入。
