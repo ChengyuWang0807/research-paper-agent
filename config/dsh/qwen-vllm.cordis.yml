@@ -1,0 +1,73 @@
+# Complete unattended DSH composition for the Qwen model served by the vLLM
+# endpoint. Keep the API key out of this file. Set RPA_VLLM_API_KEY in the
+# invoking process; dsh-llm-pi-ai resolves it through apiKeyEnv per request.
+
+- id: sdk-jsonrpc-server
+  name: '@deepseek-ai/dsh-sdk-jsonrpc-server'
+  config:
+    maxTokensAsSuccess: false
+
+- id: llm-pi-ai
+  name: '@deepseek-ai/dsh-llm-pi-ai'
+  config:
+    providers:
+      qwen-vllm:
+        apiKeyEnv: !!js process.env.RPA_DSH_API_KEY_ENV || 'RPA_VLLM_API_KEY'
+        api: openai-completions
+        baseURL: !!js process.env.RPA_DSH_BASE_URL || 'https://ai-platform-service-deploy.agentsocean.com/innova-gateway/image-deployment/jiaosc1/qwen36-35b-a3b/v1'
+        models:
+          - id: !!js process.env.RPA_DSH_MODEL || 'qwen36-35b-a3b'
+            contextWindow: !!js Number(process.env.RPA_CONTEXT_WINDOW || 128000)
+
+- id: sandbox
+  name: '@deepseek-ai/dsh-sandbox-local'
+
+- id: sandbox-policy
+  name: '@deepseek-ai/dsh-sandbox-policy'
+  config:
+    mode: danger-full-access
+    workspaceRoot: !!js process.env.DSH_CWD || process.cwd()
+
+- id: subprocess
+  name: '@deepseek-ai/dsh-subprocess-local'
+
+- id: pty
+  name: '@deepseek-ai/dsh-terminal'
+
+- id: terminal-bash
+  name: '@deepseek-ai/dsh-terminal-bash'
+  config:
+    timeoutMs: 300000
+
+- id: fs-local
+  name: '@deepseek-ai/dsh-fs-local'
+  config:
+    cwd: !!js process.env.DSH_CWD || process.cwd()
+
+- id: agent-spine
+  name: '@deepseek-ai/dsh-agent-spine-demo'
+  config:
+    includeHarnessIdentity: false
+    includeRuntimeContext: false
+    persona: !!js process.env.DSH_SYSTEM_PROMPT || 'You are a helpful research assistant.'
+    workspaceContext: false
+    skills:
+      enabled: false
+    toolBash: false
+    toolJobs: false
+
+- id: persistent-bash
+  name: '@deepseek-ai/dsh-tool-bash-persistent'
+  config:
+    timeoutMs: 300000
+
+- id: str-replace-editor
+  name: '@deepseek-ai/dsh-tool-str-replace-editor'
+  config:
+    maxOutputChars: 16000
+
+- id: sessions
+  name: '@deepseek-ai/dsh-session-persistence-jsonl'
+  config:
+    root: !!js process.env.DSH_SESSION_ROOT || './.sessions'
+    compression: none

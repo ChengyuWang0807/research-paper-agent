@@ -13,6 +13,9 @@ dependencies = ["PyYAML>=6.0.2,<7"]
 [project.optional-dependencies]
 dev = ["pytest>=8.3,<9", "ruff>=0.9,<1"]
 dsh = ["deepseek-harness-sdk"]
+retrieval = ["PyMuPDF>=1.24,<2", "zvec>=0.7,<0.8"]
+graph = ["langgraph>=1.2,<2", "langgraph-checkpoint-sqlite>=3,<4"]
+studio = ["langgraph-cli[inmem]>=0.4,<1"]
 
 [project.scripts]
 research-paper-agent = "research_paper_agent.cli:main"

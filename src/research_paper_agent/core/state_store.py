@@ -34,7 +34,8 @@ class StateStore:
                 CREATE TABLE IF NOT EXISTS stage_runs (
                     run_id TEXT PRIMARY KEY, task_id TEXT NOT NULL, stage_id TEXT NOT NULL,
                     agent_id TEXT NOT NULL, status TEXT NOT NULL, workspace TEXT NOT NULL,
-                    started_at TEXT NOT NULL, finished_at TEXT
+                    started_at TEXT NOT NULL, finished_at TEXT,
+                    session_id TEXT, session_mode TEXT, parent_session_id TEXT, dsh_home TEXT
                 );
                 CREATE TABLE IF NOT EXISTS approvals (
                     approval_id INTEGER PRIMARY KEY AUTOINCREMENT, task_id TEXT NOT NULL,
@@ -47,6 +48,16 @@ class StateStore:
                 );
                 """
             )
+            for column, definition in (
+                ("session_id", "TEXT"),
+                ("session_mode", "TEXT"),
+                ("parent_session_id", "TEXT"),
+                ("dsh_home", "TEXT"),
+            ):
+                try:
+                    connection.execute(f"ALTER TABLE stage_runs ADD COLUMN {column} {definition}")
+                except sqlite3.OperationalError:
+                    pass
 
     def create_task(self, task_id: str, topic: str, paper_paths: list[str]) -> dict[str, Any]:
         now = utc_now()
@@ -75,9 +86,24 @@ class StateStore:
             else:
                 connection.execute("UPDATE tasks SET status = ?, stage_index = ?, updated_at = ? WHERE task_id = ?", (status, stage_index, utc_now(), task_id))
 
-    def start_run(self, run_id: str, task_id: str, stage_id: str, agent_id: str, workspace: str) -> None:
+    def start_run(
+        self,
+        run_id: str,
+        task_id: str,
+        stage_id: str,
+        agent_id: str,
+        workspace: str,
+        *,
+        session_id: str | None = None,
+        session_mode: str | None = None,
+        parent_session_id: str | None = None,
+        dsh_home: str | None = None,
+    ) -> None:
         with self._connect() as connection:
-            connection.execute("INSERT INTO stage_runs VALUES (?, ?, ?, ?, 'RUNNING', ?, ?, NULL)", (run_id, task_id, stage_id, agent_id, workspace, utc_now()))
+            connection.execute(
+                "INSERT INTO stage_runs(run_id, task_id, stage_id, agent_id, status, workspace, started_at, finished_at, session_id, session_mode, parent_session_id, dsh_home) VALUES (?, ?, ?, ?, 'RUNNING', ?, ?, NULL, ?, ?, ?, ?)",
+                (run_id, task_id, stage_id, agent_id, workspace, utc_now(), session_id, session_mode, parent_session_id, dsh_home),
+            )
 
     def finish_run(self, run_id: str, status: str) -> None:
         with self._connect() as connection:
@@ -106,3 +132,9 @@ class StateStore:
         with self._connect() as connection:
             connection.execute("INSERT INTO events(task_id, event_type, payload, created_at) VALUES (?, ?, ?, ?)", (task_id, event_type, json.dumps(payload, ensure_ascii=False), utc_now()))
 
+    def list_stage_runs(self, task_id: str) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                "SELECT * FROM stage_runs WHERE task_id = ? ORDER BY started_at", (task_id,)
+            ).fetchall()
+        return [dict(row) for row in rows]

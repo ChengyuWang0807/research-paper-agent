@@ -1,10 +1,19 @@
 generation:
-  provider: openai_compatible
-  model: qwen3.6-35b-a3b
+  provider: qwen-vllm
+  model: qwen36-35b-a3b
+  base_url: https://ai-platform-service-deploy.agentsocean.com/innova-gateway/image-deployment/jiaosc1/qwen36-35b-a3b/v1
+  api_key_env: RPA_VLLM_API_KEY
 embedding:
   provider: openai_compatible
   model: qwen3-embedding-8b
 reranker:
   provider: openai_compatible
   model: qwen3-reranker-8b
-
+  enabled: false
+retrieval:
+  keyword: sqlite_fts5
+  semantic: zvec
+  fusion: rrf
+  rrf_k: 60
+  candidate_limit: 30
+  evidence_limit: 8

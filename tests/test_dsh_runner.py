@@ -42,6 +42,23 @@ def test_dsh_runner_uses_workspace_and_reads_structured_outputs(tmp_path: Path, 
 
     assert result.status is RunStatus.SUCCEEDED
     assert FakeHarness.received["cwd"] == str(workspace.resolve())
-    assert FakeHarness.received["session_root"] == str((workspace / "dsh_session").resolve())
+    assert FakeHarness.received["env"]["DSH_CWD"] == str(workspace.resolve())
+    assert FakeHarness.received["env"]["DSH_SESSION_ROOT"] == str((workspace / "dsh_session").resolve())
+    assert FakeHarness.received["dsh_home"] == str((workspace / "dsh_home").resolve())
     assert (workspace / "logs" / "dsh_result.json").exists()
 
+
+def test_dsh_settings_support_generic_provider_environment(monkeypatch) -> None:
+    monkeypatch.setenv("RPA_DSH_PROVIDER", "qwen-vllm")
+    monkeypatch.setenv("RPA_DSH_MODEL", "qwen36-35b-a3b")
+    monkeypatch.setenv("RPA_DSH_API_KEY_ENV", "RPA_VLLM_API_KEY")
+    monkeypatch.setenv("RPA_DSH_BASE_URL", "https://gateway.example/v1")
+    monkeypatch.setenv("RPA_DSH_CORDIS", "config/dsh/qwen-vllm.cordis.yml")
+
+    settings = DshSettings.from_environment()
+
+    assert settings.provider == "qwen-vllm"
+    assert settings.model == "qwen36-35b-a3b"
+    assert settings.api_key_env == "RPA_VLLM_API_KEY"
+    assert settings.base_url == "https://gateway.example/v1"
+    assert settings.cordis == "config/dsh/qwen-vllm.cordis.yml"

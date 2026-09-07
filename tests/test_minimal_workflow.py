@@ -33,3 +33,11 @@ def test_workflow_pauses_at_both_human_gates(tmp_path: Path) -> None:
     )
     assert synthesis_inputs
     assert '"previous_artifact": {' in synthesis_inputs[0].read_text(encoding="utf-8")
+
+    inspected = resumed_orchestrator.inspect("demo")
+    assert len(inspected["sessions"]) >= 5
+    assert inspected["artifacts"]
+    run_id = inspected["stage_runs"][0]["run_id"]
+    replay = resumed_orchestrator.replay("demo", run_id)
+    assert replay["run_manifest"]["run_id"] == run_id
+    assert "task_brief.json" in replay["outputs"]
